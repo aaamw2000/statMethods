@@ -55,3 +55,34 @@ confSampleSize = function(maxError, sampleVar, confidence) {
     n = ceiling(n)
     return(n)
 }
+
+# Find confidence interval for the difference of two means
+diffci = function(sampleMean1, sampleMean2, sampleVar1, sampleVar2, n1, n2, confidence, popVar=FALSE) {
+	halfAlpha = 1 - ((.5) * (1-confidence))
+    largeN = n1 >= 30 && n2 >= 30
+	if ( largeN == TRUE || popVar ) {
+    amountOfStdErr = qnorm(p = halfAlpha)
+    } else {
+        amountOfStdErr = qt(p = halfAlpha, df = n1+n2-2)
+		pooledVar = ( (n1-1)*sampleVar1 + (n2-1)*sampleVar2 ) / (n1 + n2 - 2) 
+		sampleVar1 = pooledVar
+		sampleVar2 = pooledVar
+	}
+	aggrSampleMean = abs(sampleMean1 - sampleMean2)
+	aggrSampleVar = (sampleVar1/n1) + (sampleVar2/n2)
+    stderr = sqrt(aggrSampleVar)
+    confidenceInterval = c(aggrSampleMean - (amountOfStdErr * stderr), aggrSampleMean + (amountOfStdErr * stderr))
+    return(confidenceInterval)
+}
+
+# Find confidence interval for binomial proportion p
+# Assumption: n is large enough (np > 5 & nq > 5) to justify a normal approximation
+proci = function(noSuccess, totalNumber, confidence) {
+	if (totalNumber < 6 ) return -1
+	halfAlpha = 1 - ((.5) * (1-confidence))
+	pHat = noSuccess / totalNumber # sample mean
+	stderr = sqrt( (pHat * (1-pHat)) / (totalNumber) )
+	amountOfStdErr = qnorm(p = halfAlpha)
+    confidenceInterval = c(pHat - (amountOfStdErr * stderr), pHat + (amountOfStdErr * stderr))
+	return(confidenceInterval)
+	 }
