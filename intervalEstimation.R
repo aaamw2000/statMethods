@@ -4,7 +4,7 @@ ci = function(sampleMean, sampleVar, n, confidence, popVar=FALSE) {
     # What does matter is whether our sample size is large enough (n>30) or not (n<30).
     halfAlpha = 1 - ((.5) * (1-confidence)) # right tail AKA positive alpha
     stderr = sqrt(sampleVar / n)
-    largeN = n > 30
+    largeN = n >= 30
     if ( largeN == TRUE || popVar ) {
     amountOfStdErr = qnorm(p = halfAlpha)
     } else {
@@ -21,7 +21,7 @@ nci = function(data, confidence) { # data is a numeric vector
     sampleVar = var(data)
     n = length(data)
     stderr = sqrt(sampleVar / n)
-    largeN = n > 30
+    largeN = n >= 30
     if ( largeN == TRUE ) {
     amountOfStdErr = qnorm(p = halfAlpha)
     } else {
@@ -36,7 +36,7 @@ nci = function(data, confidence) { # data is a numeric vector
 maxError = function(sampleVar, confidence, n, popVar=FALSE) {
     halfAlpha = 1 - ((.5) * (1-confidence))
     stderr = sqrt(sampleVar / n)
-    largeN = n > 30
+    largeN = n >= 30
     if ( largeN == TRUE || popVar ) {
     amountOfStdErr = qnorm(p = halfAlpha)
     } else {
