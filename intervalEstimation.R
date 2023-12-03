@@ -56,11 +56,36 @@ confSampleSize = function(maxError, sampleVar, confidence) {
     return(n)
 }
 
-# Find confidence interval for the difference of two means
+# Find confidence interval for the difference of two means from summarized data
 diffci = function(sampleMean1, sampleMean2, sampleVar1, sampleVar2, n1, n2, confidence, popVar=FALSE) {
 	halfAlpha = 1 - ((.5) * (1-confidence))
     largeN = n1 >= 30 && n2 >= 30
 	if ( largeN == TRUE || popVar ) {
+    amountOfStdErr = qnorm(p = halfAlpha)
+    } else {
+        amountOfStdErr = qt(p = halfAlpha, df = n1+n2-2)
+		pooledVar = ( (n1-1)*sampleVar1 + (n2-1)*sampleVar2 ) / (n1 + n2 - 2) 
+		sampleVar1 = pooledVar
+		sampleVar2 = pooledVar
+	}
+	aggrSampleMean = abs(sampleMean1 - sampleMean2)
+	aggrSampleVar = (sampleVar1/n1) + (sampleVar2/n2)
+    stderr = sqrt(aggrSampleVar)
+    confidenceInterval = c(aggrSampleMean - (amountOfStdErr * stderr), aggrSampleMean + (amountOfStdErr * stderr))
+    return(confidenceInterval)
+}
+
+# Find confidence interval for the difference of two means from raw data
+ndiffci = function(data1, data2, confidence) {
+	sampleMean1 = mean(data1)
+	sampleMean2 = mean(data2)
+	sampleVar1 = var(data1)
+	sampleVar2 = var(data2)
+	n1 = length(data1)
+	n2 = length(data2)
+	halfAlpha = 1 - ((.5) * (1-confidence))
+    largeN = n1 >= 30 && n2 >= 30
+	if ( largeN == TRUE ) {
     amountOfStdErr = qnorm(p = halfAlpha)
     } else {
         amountOfStdErr = qt(p = halfAlpha, df = n1+n2-2)
